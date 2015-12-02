@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <unistd.h>
 #include <string.h>
 #include <sys/stat.h>
 
@@ -96,7 +95,7 @@ void usage(int ec)
 	O("\t-x : Extract contents of file.");
 	O("\t-c : Create a new pbo.");
 	O("\t-f <str>: Use pbo file.");
-	O("\t-C <str>: Change to directory.");
+	O("\t-C <str>: Change to directory (only applies to extraction).");
 	O("\t-h : Display this.");
 	O("");
 	O("(C) 2015 Emir Marincic");
@@ -122,6 +121,9 @@ void process_args(int *argc, char ***argv)
 			break;
 		case 'f':
 			set_file(optarg);
+			break;
+		case 'C':
+			g_dir = optarg;
 			break;
 		case 'h':
 			usage(EXIT_SUCCESS);
@@ -158,7 +160,13 @@ void extract_files_cb(const char *filename, void *user)
 	pbo_t d = (pbo_t)user;
 
 	char buf[512];
-	strcpy(buf, filename);
+	if(g_dir){
+		strcpy(buf, g_dir);
+		strcat(buf, "/");
+		strcat(buf, filename);
+	}
+	else
+		strcpy(buf, filename);
 
 	for(int i = 0; buf[i] != '\0'; i++)
 		if(buf[i] == '\\')
