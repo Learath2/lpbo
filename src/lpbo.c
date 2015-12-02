@@ -108,7 +108,7 @@ void usage(int ec)
 void process_args(int *argc, char ***argv)
 {
 	int c = 0;
-	while((c = getopt(*argc, *argv, "lxcf:C:h")) != -1)
+	while((c = getopt(*argc, *argv, "lxcf:h")) != -1)
 	{
 		switch(c) {
 		case 'l':
@@ -122,9 +122,6 @@ void process_args(int *argc, char ***argv)
 			break;
 		case 'f':
 			set_file(optarg);
-			break;
-		case 'C':
-			g_dir = optarg;
 			break;
 		case 'h':
 			usage(EXIT_SUCCESS);
@@ -150,6 +147,7 @@ void list_files()
 	pbo_t d = pbo_init(g_file);
 	pbo_read_header(d);
 	pbo_get_file_list(d, list_files_cb, NULL);
+	pbo_dispose(d);
 }
 
 void extract_files_cb(const char *filename, void *user)
@@ -180,11 +178,29 @@ void extract_files()
 	pbo_t d = pbo_init(g_file);
 	pbo_read_header(d);
 	pbo_get_file_list(d, extract_files_cb, d);
+	pbo_dispose(d);
 }
 
-void create_pbo()
+void create_pbo(int fcount, char** files)
 {
-	printf("Not implemented.\n");
+	pbo_t d = pbo_init(g_file);
+	pbo_init_new(d);
+
+	for(int i = 0; i < fcount; i++) {
+		if(files[i][0] == '$') { //Header extension
+			return; //DO SMTH HERE
+		}
+		char buf[512];
+		strcpy(buf, files[i]);
+
+		for(int j = 0; buf[j] != '\0'; j++)
+			if(buf[j] == '/')
+				buf[j] = '\\';
+
+		pbo_add_file_p(d, buf, files[i]);
+	}
+	pbo_write(d);
+	pbo_dispose(d);
 }
 
 int main(int argc, char **argv)
@@ -193,11 +209,6 @@ int main(int argc, char **argv)
 	g_program_name = argv[0];
 
 	process_args(&argc, &argv);
-
-	if(g_dir && g_mode == EXTRACT){
-		makedir(g_dir);
-		chdir(g_dir);
-	}
 
 	switch(g_mode) {
 	case UNKNOWN:
@@ -210,7 +221,7 @@ int main(int argc, char **argv)
 		extract_files();
 		break;
 	case CREATE:
-		create_pbo();
+		create_pbo(argc, argv);
 		break;
 	}
 
