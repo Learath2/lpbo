@@ -40,16 +40,21 @@ const char *g_dir;
 
 void usage(int ec);
 
+void makedir(const char *path)
+{
+	#ifdef HAVE_DIRECT_H
+	    mkdir(path);
+	#else
+	    mkdir(path, 0755);
+	#endif
+}
+
 void create_directories(char *path)
 {    
     for(int i = 0; path[i] != '\0'; i++) {
         if(path[i] == '/') {
             path[i] = '\0';
-            #ifdef HAVE_DIRECT_H
-                mkdir(path);
-            #else
-                mkdir(path, 0755);
-            #endif
+            makedir(path);
             path[i] = '/';
         }
     }
@@ -82,9 +87,9 @@ void usage(int ec)
 		exit(ec);
 	}
 
-	O("=============================");
+	O("===============================");
 	O("== lpbo - An Arma Pbo editor ==");
-	O("=============================");
+	O("===============================");
 	F("usage: %s [-lxcfCh] [FILE]...", g_program_name);
 	O("");
 	O("\t-l : List contents of file.");
@@ -174,8 +179,6 @@ void extract_files()
 {
 	pbo_t d = pbo_init(g_file);
 	pbo_read_header(d);
-	if(g_dir)
-		chdir(g_dir);
 	pbo_get_file_list(d, extract_files_cb, d);
 }
 
@@ -190,6 +193,11 @@ int main(int argc, char **argv)
 	g_program_name = argv[0];
 
 	process_args(&argc, &argv);
+
+	if(g_dir && g_mode == EXTRACT){
+		makedir(g_dir);
+		chdir(g_dir);
+	}
 
 	switch(g_mode) {
 	case UNKNOWN:
