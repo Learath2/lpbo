@@ -107,7 +107,7 @@ void usage(int ec)
 void process_args(int *argc, char ***argv)
 {
 	int c = 0;
-	while((c = getopt(*argc, *argv, "lxcf:h")) != -1)
+	while((c = getopt(*argc, *argv, "lxcf:C:h")) != -1)
 	{
 		switch(c) {
 		case 'l':
