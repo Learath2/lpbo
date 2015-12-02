@@ -154,13 +154,7 @@ void extract_files_cb(const char *filename, void *user)
 	pbo_t d = (pbo_t)user;
 
 	char buf[512];
-	if(g_dir){
-		strcpy(buf, g_dir);
-		strcat(buf, "/");
-		strcat(buf, filename);
-	}
-	else
-		strcpy(buf, filename);
+	strcpy(buf, filename);
 
 	for(int i = 0; buf[i] != '\0'; i++)
 		if(buf[i] == '\\')
@@ -179,6 +173,8 @@ void extract_files()
 {
 	pbo_t d = pbo_init(g_file);
 	pbo_read_header(d);
+	if(g_dir)
+		chdir(g_dir);
 	pbo_get_file_list(d, extract_files_cb, d);
 }
 
