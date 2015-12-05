@@ -20,7 +20,7 @@
 
 #include <libpbo/pbo.h>
 
-#define MAXNAMELEN MAXNAMELEN
+#define MAXNAMELEN 512
 
 enum mode
 {
