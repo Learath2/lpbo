@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 #include <sys/stat.h>
 
 #include <getopt.h>
@@ -202,7 +203,7 @@ void create_pbo(int fcount, char** files)
 			if(!f)
 				return; //Need to exit with error
 			char data[MAXNAMELEN];
-			fgets(buf, MAXNAMELEN, f);
+			fgets(data, MAXNAMELEN, f);
 			fclose(f);
 
 			char *title = files[i];
