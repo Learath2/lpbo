@@ -20,6 +20,8 @@
 
 #include <libpbo/pbo.h>
 
+#define MAXNAMELEN MAXNAMELEN
+
 enum mode
 {
 	UNKNOWN = 0,	//None of the following
@@ -159,7 +161,7 @@ void extract_files_cb(const char *filename, void *user)
 
 	pbo_t d = (pbo_t)user;
 
-	char buf[512];
+	char buf[MAXNAMELEN];
 	if(g_dir){
 		strcpy(buf, g_dir);
 		strcat(buf, "/");
@@ -195,10 +197,23 @@ void create_pbo(int fcount, char** files)
 	pbo_init_new(d);
 
 	for(int i = 0; i < fcount; i++) {
-		if(files[i][0] == '$') { //Header extension
-			return; //DO SMTH HERE
+		if(files[i][0] == '$' && files[i][strlen(files[i]) - 1] == '$') { //Header extension
+			FILE *f = fopen(files[i], "r");
+			if(!f)
+				return; //Need to exit with error
+			char data[MAXNAMELEN];
+			fgets(buf, MAXNAMELEN, f);
+			fclose(f);
+
+			char *title = files[i];
+			title++;
+			title[strlen(title) - 1] = '\0';
+			for(; *title; ++title) *title = tolower(*title); //Compatibility with other pbo tools
+
+			pbo_add_extension(d, title);
+			pbo_add_extension(d, data);
 		}
-		char buf[512];
+		char buf[MAXNAMELEN];
 		strcpy(buf, files[i]);
 
 		for(int j = 0; buf[j] != '\0'; j++)
