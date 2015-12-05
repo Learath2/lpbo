@@ -130,6 +130,7 @@ void process_args(int *argc, char ***argv)
 			break;
 		case 'h':
 			usage(EXIT_SUCCESS);
+			exit(EXIT_SUCCESS);
 			break;
 		case '?':
 		default:
