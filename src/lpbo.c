@@ -12,6 +12,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 #include <getopt.h>
 
@@ -49,6 +50,13 @@ void makedir(const char *path)
 	#else
 	    mkdir(path, 0755);
 	#endif
+}
+
+bool isdir(const char *path)
+{
+    struct stat buf;
+    stat(path, &buf);
+    return ((buf.st_mode & S_IFMT) == S_IFDIR);
 }
 
 void create_directories(char *path)
@@ -193,37 +201,59 @@ void extract_files()
 	pbo_dispose(d);
 }
 
+void add_file(const char *file)
+{
+	if(isdir(file)) { //Directory
+		DIR *dir = opendir(file);
+		if(!dir)
+			return;
+
+		struct dirent *dp;
+		while(dp = readdir(dir), dp) {
+			if(!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, ".."))
+				continue;
+			char buf[MAXNAMELEN];
+			sprintf(buf, "%s/%s", file, dp->d_name);
+			add_file(buf);
+		}
+		closedir(dir);
+	}
+	else if (file[0] == '$' && file[strlen(file) - 1] == '$') { //Header extension
+		FILE *f = fopen(file, "r");
+		if(!f)
+			return;
+		char data[MAXNAMELEN];
+		fgets(data, MAXNAMELEN, f);
+		fclose(F);
+
+		char title[MAXNAMELEN];
+		strcpy(title, file + 1);
+		title[strlen(title) - 1] = '\0';
+		for(; *title; ++title) *title = tolower(*title);
+
+		pbo_add_extension(d, title);
+		pbo_add_extension(d, data);
+	}
+	else { //File
+		char buf[MAXNAMELEN];
+		strcpy(buf, file);
+
+		for(int i = 0; buf[i] != '\0'; i++)
+			if(buf[i] == '/')
+				buf[i] = '\\';
+
+		pbo_add_file_p(d, buf, file);
+	}
+}
+
 void create_pbo(int fcount, char** files)
 {
 	pbo_t d = pbo_init(g_file);
 	pbo_init_new(d);
 
-	for(int i = 0; i < fcount; i++) {
-		if(files[i][0] == '$' && files[i][strlen(files[i]) - 1] == '$') { //Header extension
-			FILE *f = fopen(files[i], "r");
-			if(!f)
-				return; //Need to exit with error
-			char data[MAXNAMELEN];
-			fgets(data, MAXNAMELEN, f);
-			fclose(f);
-
-			char *title = files[i];
-			title++;
-			title[strlen(title) - 1] = '\0';
-			for(; *title; ++title) *title = tolower(*title); //Compatibility with other pbo tools
-
-			pbo_add_extension(d, title);
-			pbo_add_extension(d, data);
-		}
-		char buf[MAXNAMELEN];
-		strcpy(buf, files[i]);
-
-		for(int j = 0; buf[j] != '\0'; j++)
-			if(buf[j] == '/')
-				buf[j] = '\\';
-
-		pbo_add_file_p(d, buf, files[i]);
-	}
+	for(int i = 0; i < fcount; i++)
+		add_file(files[i]);
+		
 	pbo_write(d);
 	pbo_dispose(d);
 }
