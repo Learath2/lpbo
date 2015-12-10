@@ -265,10 +265,13 @@ int main(int argc, char **argv)
 	g_program_name = argv[0];
 
 	process_args(&argc, &argv);
+	if(g_dir && g_mode != EXTRACT) {
+		USAGE_E("You may not specify -C without -x.")
+	}
 
 	switch(g_mode) {
 	case UNKNOWN:
-		USAGE_E("You must specify one of the '-xcl' options")
+		USAGE_E("You must specify one of the '-xcl' options.")
 		break;
 	case LIST:
 		list_files();
