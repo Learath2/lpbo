@@ -98,7 +98,7 @@ void usage(int ec)
 	}
 
 	O("===============================");
-	O("== lpbo - An Arma Pbo editor ==");
+	O("== lpbo "PACKAGE_VERSION" - An Arma Pbo editor ==");
 	O("===============================");
 	F("usage: %s [-lxcfCh] [FILE]...", g_program_name);
 	O("");
@@ -107,6 +107,7 @@ void usage(int ec)
 	O("\t-c : Create a new pbo.");
 	O("\t-f <str>: Use pbo file.");
 	O("\t-C <str>: Change to directory (only applies to extraction).");
+	O("\t-V : Print version to stdout.");
 	O("\t-h : Display this.");
 	O("");
 	O("(C) 2015 Emir Marincic");
@@ -118,7 +119,7 @@ void usage(int ec)
 void process_args(int *argc, char ***argv)
 {
 	int c = 0;
-	while((c = getopt(*argc, *argv, "lxcf:C:h")) != -1)
+	while((c = getopt(*argc, *argv, "lxcf:C:Vh")) != -1)
 	{
 		switch(c) {
 		case 'l':
@@ -135,6 +136,10 @@ void process_args(int *argc, char ***argv)
 			break;
 		case 'C':
 			g_dir = optarg;
+			break;
+		case 'V':
+			puts(PACKAGE_VERSION);
+			exit(EXIT_SUCCESS);
 			break;
 		case 'h':
 			usage(EXIT_SUCCESS);
