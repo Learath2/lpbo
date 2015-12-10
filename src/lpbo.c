@@ -214,7 +214,7 @@ void add_file(pbo_t d, const char *file)
 				continue;
 			char buf[MAXNAMELEN];
 			sprintf(buf, "%s/%s", file, dp->d_name);
-			add_file(buf);
+			add_file(d, buf);
 		}
 		closedir(dir);
 	}
@@ -224,11 +224,12 @@ void add_file(pbo_t d, const char *file)
 			return;
 		char data[MAXNAMELEN];
 		fgets(data, MAXNAMELEN, f);
-		fclose(F);
+		fclose(f);
 
-		char title[MAXNAMELEN];
-		strcpy(title, file + 1);
-		title[strlen(title) - 1] = '\0';
+		char atitle[MAXNAMELEN];
+		strcpy(atitle, file + 1);
+		atitle[strlen(atitle) - 1] = '\0';
+		char *title = &atitle[0];
 		for(; *title; ++title) *title = tolower(*title);
 
 		pbo_add_extension(d, title);
