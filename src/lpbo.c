@@ -97,9 +97,9 @@ void usage(int ec)
 		exit(ec);
 	}
 
-	O("===============================");
+	O("=====================================");
 	O("== lpbo "PACKAGE_VERSION" - An Arma Pbo editor ==");
-	O("===============================");
+	O("=====================================");
 	F("usage: %s [-lxcfCh] [FILE]...", g_program_name);
 	O("");
 	O("\t-l : List contents of file.");
