@@ -201,7 +201,7 @@ void extract_files()
 	pbo_dispose(d);
 }
 
-void add_file(const char *file)
+void add_file(pbo_t d, const char *file)
 {
 	if(isdir(file)) { //Directory
 		DIR *dir = opendir(file);
@@ -252,7 +252,7 @@ void create_pbo(int fcount, char** files)
 	pbo_init_new(d);
 
 	for(int i = 0; i < fcount; i++)
-		add_file(files[i]);
+		add_file(d, files[i]);
 		
 	pbo_write(d);
 	pbo_dispose(d);
