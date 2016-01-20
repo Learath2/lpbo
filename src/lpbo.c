@@ -60,7 +60,7 @@ bool isdir(const char *path)
 }
 
 void create_directories(char *path)
-{    
+{
     for(int i = 0; path[i] != '\0'; i++) {
         if(path[i] == '/') {
             path[i] = '\0';
@@ -91,7 +91,7 @@ void usage(int ec)
 	FILE *str = ec == EXIT_FAILURE ? stderr : stdout;
 	#define O(STR) fputs(STR "\n", str)
 	#define F(STR, ...) fprintf(str, STR "\n", __VA_ARGS__)
-	
+
 	if(ec == EXIT_FAILURE){
 		F("Try '%s -h' for more information.", g_program_name);
 		exit(ec);
@@ -235,9 +235,10 @@ void add_file(pbo_t d, const char *file)
 		strcpy(atitle, file + 1);
 		atitle[strlen(atitle) - 1] = '\0';
 		char *title = &atitle[0];
+		char *o = title;
 		for(; *title; ++title) *title = tolower(*title);
 
-		pbo_add_extension(d, title);
+		pbo_add_extension(d, o);
 		pbo_add_extension(d, data);
 	}
 	else { //File
@@ -259,7 +260,7 @@ void create_pbo(int fcount, char** files)
 
 	for(int i = 0; i < fcount; i++)
 		add_file(d, files[i]);
-		
+
 	pbo_write(d);
 	pbo_dispose(d);
 }
